@@ -252,7 +252,7 @@ def test_tool_from_callable_schema_generation():
 
 @pytest.mark.skipif(importlib.util.find_spec("mcp") is None, reason="mcp not installed")
 def test_as_mcp_smoke():
-    """as_mcp registers every tool on a FastMCP server."""
+    """as_mcp registers every tool on an MCP server."""
     import anyio
 
     server = FHIRToolkit().as_mcp()

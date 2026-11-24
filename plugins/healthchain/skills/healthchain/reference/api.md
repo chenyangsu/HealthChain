@@ -127,7 +127,7 @@ assert [t.name for t in kit.get_tools()] == [
 `list_codes` is registered only when the lookup is enumerable (has `entries()`); the other seven are always present. The assertion above is the contract — if the toolkit gains or loses a tool, CI fails here rather than letting the skill teach a stale list.
 
 Views:
-- `kit.as_mcp(name="healthchain")` → a FastMCP server; `.run()` serves over stdio. Needs `healthchain[mcp]`.
+- `kit.as_mcp(name="healthchain")` → an MCP server (`MCPServer` on mcp 2.x, `FastMCP` on 1.x); `.run()` serves over stdio. Needs `healthchain[mcp]`.
 - `kit.as_langchain()` → a list of `StructuredTool`. Needs `healthchain[langchain]`.
 - `kit.get_tools()` → `Tool` objects; `t.spec` is a plain dict for a hand-rolled loop.
 - `kit.run_tool(name, arguments)` → call one directly.

@@ -386,28 +386,34 @@ class FHIRToolkit:
             )
         return tools
 
-    def as_mcp(self, name: str = "healthchain", **fastmcp_kwargs: Any):
+    def as_mcp(self, name: str = "healthchain", **server_kwargs: Any):
         """Package the toolkit as an MCP server (requires healthchain[mcp]).
 
-        Returns a FastMCP instance; call ``.run()`` on it to serve over stdio,
-        or ``.run(transport="streamable-http")`` for HTTP.
+        Returns an MCPServer on mcp 2.x, or a FastMCP instance on mcp 1.x.
+        Call ``.run()`` on it to serve over stdio, or
+        ``.run(transport="streamable-http")`` for HTTP. Extra keyword arguments
+        go to the server constructor.
         """
         try:
-            from mcp.server.fastmcp import FastMCP
+            # mcp 2.x renamed FastMCP to MCPServer and removed mcp.server.fastmcp.
+            from mcp.server.mcpserver import MCPServer as Server
         except ImportError:
-            raise ImportError(
-                "Could not import mcp. Install it with: `pip install healthchain[mcp]`"
-            )
+            try:
+                from mcp.server.fastmcp import FastMCP as Server
+            except ImportError:
+                raise ImportError(
+                    "Could not import mcp. Install it with: `pip install healthchain[mcp]`"
+                )
 
-        instructions = fastmcp_kwargs.pop(
+        instructions = server_kwargs.pop(
             "instructions",
             "FHIR tools for clinical data: build and validate resources, read "
             "loaded bundles, and look up terminology codes. Codes should come "
             "from lookup_code, never from memory.",
         )
-        server = FastMCP(name, instructions=instructions, **fastmcp_kwargs)
+        server = Server(name, instructions=instructions, **server_kwargs)
         for tool in self.get_tools():
-            # structured_output=False: results are JSON content. FastMCP cannot
+            # structured_output=False: results are JSON content. The SDK cannot
             # derive an output model from Dict[str, Any] returns, and the
             # errors-as-values convention needs no output schema.
             server.add_tool(
